@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "1010165520270",
+    "firebase_url": "https://report-fire-a4863-default-rtdb.firebaseio.com",
+    "project_id": "report-fire-a4863",
+    "storage_bucket": "report-fire-a4863.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1010165520270:android:c0e540d3898fbca312f6df",
+        "android_client_info": {
+          "package_name": "xbisme.iot_project"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDkD5-zyP0b3qM4DapzSrf6Xh-eU9kHTvA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

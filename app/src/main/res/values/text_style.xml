@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="text_style">
+        <item name="android:fontFamily">@font/open_sans</item>
+        <item name="android:textColor">@color/text_login</item>
+        <item name="android:shadowRadius">10</item>
+        <item name="android:shadowDx">0</item>
+        <item name="android:shadowDy">4</item>
+        <item name="android:shadowColor">#80000000</item>
+    </style>
+</resources>
