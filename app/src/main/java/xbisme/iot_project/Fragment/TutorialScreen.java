@@ -31,7 +31,6 @@ public class TutorialScreen extends Fragment implements View.OnClickListener {
         skip_btn = view.findViewById(R.id.skip_button_tur);
         started_btn.setOnClickListener(this);
         skip_btn.setOnClickListener(this);
-
     }
 
     @Override

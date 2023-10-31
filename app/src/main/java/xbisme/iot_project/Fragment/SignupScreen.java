@@ -1,66 +1,100 @@
 package xbisme.iot_project.Fragment;
 
+import static android.app.ProgressDialog.show;
+
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.Navigation;
 
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import xbisme.iot_project.Activity.MainActivity;
 import xbisme.iot_project.R;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SignupScreen#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class SignupScreen extends Fragment {
+    TextView text;
+    EditText email, password, displayName,userAddress,userPhone;
+    AppCompatButton signup_btn;
+    private FirebaseAuth mAuth;
+// ...
+// Initialize Firebase Auth
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    public SignupScreen() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SignupScreen.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static SignupScreen newInstance(String param1, String param2) {
-        SignupScreen fragment = new SignupScreen();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
+    @Nullable
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_signup_screen, container,false);
+        return rootView;
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        mAuth = FirebaseAuth.getInstance();
+        text = view.findViewById(R.id.signup_click);
+        signup_btn = view.findViewById(R.id.btn_signup);
+        email = view.findViewById(R.id.signup_email);
+        password = view.findViewById(R.id.password_signup);
+        displayName = view.findViewById(R.id.name_signup);
+        userPhone = view.findViewById(R.id.signup_phone);
+        userAddress = view.findViewById(R.id.signup_address);
+        text.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Navigation.findNavController(view).navigate(R.id.action_signupScreen_to_loginScreen);
+            }
+        });
+
+        signup_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String indexEmail, indexPassword, indexName,indexAddress, indexPhone;
+                indexEmail = String.valueOf(email.getText());
+                indexPassword = String.valueOf(password.getText());
+                indexName = String.valueOf(displayName.getText());
+                indexPhone = String.valueOf(userPhone.getText());
+                indexAddress = String.valueOf(userAddress.getText());
+                mAuth.createUserWithEmailAndPassword(indexEmail, indexPassword)
+                        .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                            @Override
+                            public void onComplete(@NonNull Task<AuthResult> task) {
+                                if (task.isSuccessful()) {
+                                    FirebaseUser user;
+                                    user = FirebaseAuth.getInstance().getCurrentUser();
+                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                            .setDisplayName(indexName)
+                                            .build();
+                                    Log.i("result", indexName);
+                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
+                                    databaseReference.child(user.getUid()).child("address").setValue(indexAddress);
+                                    databaseReference.child(user.getUid()).child("phone").setValue(indexPhone);
+                                    // Sign in success, update UI with the signed-in user's information
+                                    Navigation.findNavController(view).navigate(R.id.action_signupScreen_to_mainScreen);
+                                }
+                            }
+                        });
+            }
+        });
     }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_signup_screen, container, false);
-    }
 }

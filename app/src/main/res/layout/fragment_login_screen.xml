@@ -91,6 +91,7 @@
             android:layout_height="wrap_content"
             android:text="Forgot password"
             style="@style/text_style"
+            android:textStyle="bold"
             android:textSize="16dp"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
@@ -137,6 +138,8 @@
             style="@style/text_style"
             android:textSize="16dp"
             android:textStyle="bold"
+            android:onClick="onClick"
+            android:clickable="true"
             />
     </RelativeLayout>
 </LinearLayout>
