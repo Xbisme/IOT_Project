@@ -21,11 +21,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import xbisme.iot_project.Data.ReadWriteUserDetail;
 import xbisme.iot_project.R;
 
 
 public class MainScreen extends Fragment {
-    FirebaseUser user;
+    private FirebaseAuth auth;
     TextView hi_text, location_text;
     @Nullable
     @Override
@@ -37,22 +38,28 @@ public class MainScreen extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
         hi_text = view.findViewById(R.id.hi_text);
         location_text = view.findViewById(R.id.location_text);
 
-        if (user != null) {
-            for (UserInfo profile : user.getProviderData()) {
-                // Id of the provider (ex: google.com)
-                String providerId = profile.getProviderId();
+        if (auth != null) {
+            DatabaseReference databaseReference =  FirebaseDatabase.getInstance().getReference("user");
+            databaseReference.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
+                    if(writeUserDetail != null){
+                        hi_text.setText("Hi, " + writeUserDetail.getName());
+                        location_text.setText("Location: "+ writeUserDetail.getAddress());
+                    }
+                }
 
-                // UID specific to the provider
-                String uid = profile.getDisplayName();
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
 
-                // Name, email address, and profile photo Url
-                String name = profile.getDisplayName();
-                hi_text.setText("Hi, " + uid);
-            }
+                }
+            });
         }
     }
 }

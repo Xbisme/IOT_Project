@@ -26,15 +26,23 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import xbisme.iot_project.Activity.MainActivity;
+import xbisme.iot_project.Data.ReadWriteUserDetail;
 import xbisme.iot_project.R;
 
 public class SignupScreen extends Fragment {
     TextView text;
-    EditText email, password, displayName,userAddress,userPhone;
+    EditText email;
+    EditText password;
+    EditText displayName;
+    EditText userAddress;
+    EditText userPhone;
     AppCompatButton signup_btn;
     private FirebaseAuth mAuth;
 // ...
@@ -79,22 +87,24 @@ public class SignupScreen extends Fragment {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
                                 if (task.isSuccessful()) {
-                                    FirebaseUser user;
-                                    user = FirebaseAuth.getInstance().getCurrentUser();
-                                    UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                                            .setDisplayName(indexName)
-                                            .build();
-                                    Log.i("result", indexName);
-                                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("users");
-                                    databaseReference.child(user.getUid()).child("address").setValue(indexAddress);
-                                    databaseReference.child(user.getUid()).child("phone").setValue(indexPhone);
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Navigation.findNavController(view).navigate(R.id.action_signupScreen_to_mainScreen);
+                                    FirebaseUser user = mAuth.getCurrentUser();
+                                    ReadWriteUserDetail writeUserDetail =  new ReadWriteUserDetail(indexName,indexAddress,indexPhone);
+                                    DatabaseReference referenceProfile = FirebaseDatabase.getInstance().getReference("user");
+                                    referenceProfile.child(user.getUid()).setValue(writeUserDetail).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                        @Override
+                                        public void onComplete(@NonNull Task<Void> task) {
+                                            Navigation.findNavController(view).navigate(R.id.action_signupScreen_to_mainScreen);
+                                        }
+                                    });
+
+
                                 }
                             }
+
                         });
             }
         });
     }
+
 
 }
