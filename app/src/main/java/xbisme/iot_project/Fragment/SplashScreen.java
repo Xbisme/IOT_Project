@@ -20,12 +20,8 @@ public class SplashScreen extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_splash_screen, container, false);
         Handler h = new Handler();
-        h.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                Navigation.findNavController(rootView).navigate(R.id.action_splashScreen_to_tutorialScreen);
-            }
-        },2000);
+        h.postDelayed(() -> Navigation.findNavController(rootView)
+                .navigate(R.id.action_splashScreen_to_tutorialScreen),2000);
         return rootView;
     }
 }

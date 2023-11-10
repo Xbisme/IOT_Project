@@ -1,6 +1,16 @@
 package xbisme.iot_project.Fragment;
 
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -8,67 +18,106 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.TextView;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.FirebaseAuthException;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthInvalidUserException;
+
+import java.util.Objects;
 
 import xbisme.iot_project.R;
 
-
 public class LoginScreen extends Fragment {
-    EditText email, password;
-    TextView text;
-    AppCompatButton login_btn;
-    FirebaseAuth mAuth;
+    private EditText email, password;
+    private ImageView hide_show_icon;
+    private FirebaseAuth mAuth;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_login_screen, container,false);
-        return rootView;
+        return inflater.inflate(R.layout.fragment_login_screen, container,false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        text = view.findViewById(R.id.signup_btn);
-        login_btn = view.findViewById(R.id.login_btn);
+        TextView signup = view.findViewById(R.id.signup_btn);
+        AppCompatButton login_btn = view.findViewById(R.id.login_btn);
         mAuth = FirebaseAuth.getInstance();
         email = view.findViewById(R.id.login_email);
         password = view.findViewById(R.id.password_email);
-        text.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Navigation.findNavController(view).navigate(R.id.action_loginScreen_to_signupScreen);
+        hide_show_icon = view.findViewById(R.id.hide_show_pass_log);
+
+        signup.setOnClickListener(view1 ->
+                Navigation.findNavController(view1)
+                        .navigate(R.id.action_loginScreen_to_signupScreen));
+
+        login_btn.setOnClickListener(view12 -> {
+            String indexEmail, indexPassword;
+            indexEmail = String.valueOf(email.getText());
+            indexPassword = String.valueOf(password.getText());
+
+            if(TextUtils.isEmpty(indexEmail)) {
+                email.setError("Please enter your email");
+                email.requestFocus();
+                return;
             }
-        });
-        login_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String indexEmail, indexPassword;
-                indexEmail = String.valueOf(email.getText());
-                indexPassword = String.valueOf(password.getText());
-                mAuth.signInWithEmailAndPassword(indexEmail, indexPassword)
-                        .addOnCompleteListener( new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information
-                                    Navigation.findNavController(view).navigate(R.id.action_loginScreen_to_mainScreen);
+            else if(TextUtils.isEmpty(indexPassword)) {
+                password.setError("Please enter your password");
+                password.requestFocus();
+                return;
+            }
+
+            mAuth.signInWithEmailAndPassword(indexEmail, indexPassword)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Navigation.findNavController(view12)
+                                    .navigate(R.id.action_loginScreen_to_mainScreen);
+                        }
+
+                            else{
+                                try {
+                                    throw Objects.requireNonNull(task.getException());
+                                } catch (FirebaseAuthInvalidCredentialsException |
+                                         FirebaseAuthInvalidUserException e) {
+                                    handleFirebaseAuthException(e);
+                                } catch (Exception e) {
+                                    Log.e("Failed to log", "Failed");
                                 }
                             }
                         });
+        });
 
+        hide_show_icon.setOnClickListener(view13 -> {
+            if(password.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                hide_show_icon.setImageResource(R.drawable.hide);
+            }
+            else {
+                password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                hide_show_icon.setImageResource(R.drawable.show);
             }
         });
+    }
+    private void handleFirebaseAuthException(FirebaseAuthException e) {
+        String errorCode = e.getErrorCode();
+
+        switch (errorCode) {
+            case "ERROR_WRONG_PASSWORD":
+                password.setError("Your password is wrong. Please check and try again");
+                password.requestFocus();
+                break;
+            case "ERROR_INVALID_EMAIL":
+                email.setError("Your email is invalid. Please use another email or register");
+                email.requestFocus();
+                break;
+            case "ERROR_USER_NOT_FOUND":
+                email.setError("Your email is not assigned. Please register");
+                email.requestFocus();
+                break;
+            default:
+                Log.e("Failed to log", errorCode);
+                break;
+        }
     }
 }

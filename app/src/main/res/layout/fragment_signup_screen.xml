@@ -113,6 +113,7 @@
                 android:padding="15dp"
                 android:textColor="@color/black"
                 />
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -121,18 +122,37 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="13dp"
                 />
-            <EditText
-                android:id="@+id/password_signup"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_btn_login"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="10dp"
-                android:hint="Enter your password"
-                android:padding="15dp"
-                android:textColor="@color/black"
-                />
+                android:padding="0dp"
+                android:background="@drawable/bg_btn_login"
+                android:layout_marginEnd="10dp">
+                <EditText
+                    android:padding="15dp"
+                    android:background="@drawable/bg_btn_login"
+                    android:id="@+id/password_signup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Enter your password"
+                    android:textColor="@color/black"
+                    android:inputType="textPassword"
+                    android:layout_toStartOf="@+id/hide_show_pass_sig"
+                    />
+                <ImageView
+                    android:id="@+id/hide_show_pass_sig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/hide"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+                    />
+            </RelativeLayout>
+
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -141,38 +161,35 @@
                 android:layout_marginStart="20dp"
                 android:layout_marginTop="13dp"
                 />
-            <EditText
-                android:id="@+id/cf_password_signup"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_btn_login"
                 android:layout_marginTop="8dp"
                 android:layout_marginStart="20dp"
-                android:layout_marginEnd="10dp"
-                android:hint="Enter your password"
-                android:padding="15dp"
-                android:textColor="@color/black"
-                />
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Authenticator Token"
-                android:layout_marginTop="13dp"
-                style="@style/text_style"
-                android:layout_marginStart="20dp"
-                />
-            <EditText
-                android:id="@+id/signup_authen"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:padding="0dp"
                 android:background="@drawable/bg_btn_login"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="20dp"
-                android:layout_marginEnd="10dp"
-                android:hint="Enter your token code"
-                android:padding="15dp"
-                android:textColor="@color/black"
-                />
+                android:layout_marginEnd="10dp">
+                <EditText
+                    android:id="@+id/cf_password_signup"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_login"
+                    android:hint="Enter your password"
+                    android:padding="15dp"
+                    android:textColor="@color/black"
+                    android:layout_toStartOf="@+id/hide_show_cfpass_sig"
+                    />
+                <ImageView
+                    android:id="@+id/hide_show_cfpass_sig"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/hide"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="5dp"
+
+                    />
+            </RelativeLayout>
         </LinearLayout>
     </ScrollView>
     <androidx.appcompat.widget.AppCompatButton

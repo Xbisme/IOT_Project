@@ -16,19 +16,17 @@ import xbisme.iot_project.R;
 
 
 public class TutorialScreen extends Fragment implements View.OnClickListener {
-    private AppCompatButton started_btn, skip_btn;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_tutorial_screen, container,false);
-        return rootView;
+        return inflater.inflate(R.layout.fragment_tutorial_screen, container,false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        started_btn = view.findViewById(R.id.get_started_btn);
-        skip_btn = view.findViewById(R.id.skip_button_tur);
+        AppCompatButton started_btn = view.findViewById(R.id.get_started_btn);
+        AppCompatButton skip_btn = view.findViewById(R.id.skip_button_tur);
         started_btn.setOnClickListener(this);
         skip_btn.setOnClickListener(this);
     }
