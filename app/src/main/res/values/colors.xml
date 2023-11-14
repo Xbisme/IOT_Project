@@ -12,4 +12,8 @@
     <color name="spinner_background">#3362A9</color>
     <color name="stroke_spinner">#FFFFFF</color>
     <color name="text_login_btn">#6441A5</color>
+    <color name="normal"> #7CFC00</color>
+    <color name="warning">#DFFF00</color>
+    <color name="dangerous">#FF5733 </color>
+    <color name="back_progress">#DDD</color>
 </resources>

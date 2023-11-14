@@ -51,5 +51,9 @@
         android:id="@+id/mainScreen"
         android:name="xbisme.iot_project.Fragment.MainScreen"
         android:label="fragment_main_screen"
-        tools:layout="@layout/fragment_main_screen" />
+        tools:layout="@layout/fragment_main_screen" >
+        <action
+            android:id="@+id/action_mainScreen_to_loginScreen"
+            app:destination="@id/loginScreen" />
+    </fragment>
 </navigation>

@@ -9,11 +9,11 @@
         <solid android:color="#DDD"/>
         </shape>
     </item>
-    <item>
+    <item android:id="@+id/second_level">
         <shape android:shape="ring"
             android:thicknessRatio="16"
             android:useLevel="true">
-            <solid android:color="@color/purple_200"/>
+            <solid android:color="@color/normal"/>
         </shape>
     </item>
 </layer-list>

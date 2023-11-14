@@ -175,12 +175,12 @@ public class SignupScreen extends Fragment {
             }
         });
         hide_show_cf_icon.setOnClickListener(view13 -> {
-            if(password.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
-                password.setTransformationMethod(PasswordTransformationMethod.getInstance());
+            if(confirm_password.getTransformationMethod().equals(HideReturnsTransformationMethod.getInstance())){
+                confirm_password.setTransformationMethod(PasswordTransformationMethod.getInstance());
                 hide_show_cf_icon.setImageResource(R.drawable.hide);
             }
             else {
-                password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                confirm_password.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
                 hide_show_cf_icon.setImageResource(R.drawable.show);
             }
         });

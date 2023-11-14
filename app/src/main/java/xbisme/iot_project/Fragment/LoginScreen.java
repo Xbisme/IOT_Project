@@ -1,5 +1,7 @@
 package xbisme.iot_project.Fragment;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
@@ -8,6 +10,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,6 +35,9 @@ public class LoginScreen extends Fragment {
     private ImageView hide_show_icon;
     private FirebaseAuth mAuth;
 
+    private CheckBox checkBox;
+
+    private static final String SHARE_PREFS = "sharedPrefs";
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -47,6 +53,14 @@ public class LoginScreen extends Fragment {
         email = view.findViewById(R.id.login_email);
         password = view.findViewById(R.id.password_email);
         hide_show_icon = view.findViewById(R.id.hide_show_pass_log);
+        checkBox = view.findViewById(R.id.checkbox_remember);
+
+        SharedPreferences share = getContext().getSharedPreferences(SHARE_PREFS, Context.MODE_PRIVATE);
+        String check = share.getString("name","");
+        if (check.equals("true")) {
+            Navigation.findNavController(view)
+                    .navigate(R.id.action_loginScreen_to_mainScreen);
+        }
 
         signup.setOnClickListener(view1 ->
                 Navigation.findNavController(view1)
@@ -71,8 +85,20 @@ public class LoginScreen extends Fragment {
             mAuth.signInWithEmailAndPassword(indexEmail, indexPassword)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
+                            SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARE_PREFS,Context.MODE_PRIVATE);
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            if (checkBox.isChecked()) {
+
+                                editor.putString("name","true");
+                                editor.apply();
+                            }
+                            else {
+                                editor.putString("name","");
+                                editor.apply();
+                            }
                             Navigation.findNavController(view12)
                                     .navigate(R.id.action_loginScreen_to_mainScreen);
+
                         }
 
                             else{

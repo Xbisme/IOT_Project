@@ -73,6 +73,7 @@
             />
     </RelativeLayout>
     <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/location_title"
@@ -97,26 +98,13 @@
                 android:textColor="@color/black"
                 android:textSize="15dp" />
 
-            <ProgressBar
+            <ImageView
                 android:id="@+id/flame_sensor"
                 android:layout_width="150dp"
                 android:layout_height="150dp"
-                android:layout_centerVertical="true"
-                android:indeterminateOnly="false"
+                android:src="@drawable/no_fire"
                 android:progress="60"
-                android:progressDrawable="@drawable/circle"
-                android:rotation="-270" />
-
-            <TextView
-                android:id="@+id/flame_text"
-                style="@style/text_style"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="60%"
-                android:layout_centerVertical="true"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/black"
-                />
+                android:rotation="0" />
         </RelativeLayout>
         <RelativeLayout
             android:id="@+id/humidity_layout"
@@ -185,8 +173,6 @@
                 android:layout_height="150dp"
                 android:indeterminateOnly="false"
                 android:layout_centerVertical="true"
-                android:indeterminate="false"
-                android:progress="60"
                 android:progressDrawable="@drawable/circle"
                 android:rotation="-270" />
 
@@ -244,5 +230,15 @@
                 />
         </RelativeLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/logout_btn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_btn_login"
+        android:layout_below="@id/constraint"
+        android:layout_marginTop="30dp"
+        android:padding="15dp"
+        android:text="Logout"
+        android:layout_marginHorizontal="20dp"
+        />
 </RelativeLayout>
