@@ -71,12 +71,12 @@ public class LoginScreen extends Fragment {
             indexEmail = String.valueOf(email.getText());
             indexPassword = String.valueOf(password.getText());
 
-            if(TextUtils.isEmpty(indexEmail)) {
+            if(indexEmail.isEmpty()) {
                 email.setError("Please enter your email");
                 email.requestFocus();
                 return;
             }
-            else if(TextUtils.isEmpty(indexPassword)) {
+            else if(indexPassword.isEmpty()) {
                 password.setError("Please enter your password");
                 password.requestFocus();
                 return;

@@ -15,6 +15,7 @@ import androidx.appcompat.widget.AppCompatButton;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -42,6 +43,8 @@ public class MainScreen extends Fragment {
     private ImageView flame;
     private static final String SHARE_PREFS = "sharedPrefs";
     private AppCompatButton logOut_btn;
+
+    private SwipeRefreshLayout swipeRefreshLayout;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -62,7 +65,9 @@ public class MainScreen extends Fragment {
         gas = view.findViewById(R.id.gas_sensor);
         gas_tex = view.findViewById(R.id.gas_text);
         flame = view.findViewById(R.id.flame_sensor);
+        swipeRefreshLayout = view.findViewById(R.id.swipe_container);
 
+        swipeToRefresh(user);
         logOut_btn = view.findViewById(R.id.logout_btn);
 
         logOut_btn.setOnClickListener(new View.OnClickListener() {
@@ -78,34 +83,51 @@ public class MainScreen extends Fragment {
         });
 
         if (user != null) {
-                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user");
-                databaseReference.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
-                        if(writeUserDetail != null){
-                            hi_text.setText("Hi, " + writeUserDetail.getName());
-                            location_text.setText("Location: "+ writeUserDetail.getAddress());
+            updateUI(user);
 
-                            temperature.setSecondaryProgress((int) writeUserDetail.getTemp());
-                            temperature_text.setText(writeUserDetail.getTemp() + "°C");
-
-                            humidity.setProgress((int)(writeUserDetail.getHumidity()));
-                            humidity_text.setText(writeUserDetail.getHumidity() + "%");
-
-                            gas.setProgress((int)writeUserDetail.getGas()/10);
-                            gas_tex.setText(writeUserDetail.getGas() + "ppm");
-                            changeFlameUi(writeUserDetail);
-
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
-                });
         }
     }
+
+    private void updateUI(FirebaseUser user) {
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user");
+        databaseReference.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
+                if(writeUserDetail != null){
+                    hi_text.setText("Hi, " + writeUserDetail.getName());
+                    location_text.setText("Location: "+ writeUserDetail.getAddress());
+
+                    temperature.setSecondaryProgress((int) writeUserDetail.getTemp());
+                    temperature_text.setText(writeUserDetail.getTemp() + "°C");
+
+                    humidity.setProgress((int)(writeUserDetail.getHumidity()));
+                    humidity_text.setText(writeUserDetail.getHumidity() + "%");
+
+                    gas.setProgress((int)writeUserDetail.getGas()/10);
+                    gas_tex.setText(writeUserDetail.getGas() + "ppm");
+                    changeFlameUi(writeUserDetail);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+            }
+        });
+    }
+
+    private void swipeToRefresh(FirebaseUser user) {
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                updateUI(user);
+                swipeRefreshLayout.setRefreshing(false);
+
+            }
+        });
+    }
+
     private void changeTempUi(ReadWriteUserDetail writeUserDetail) {
         if(writeUserDetail != null) {
             double temp = writeUserDetail.getTemp();

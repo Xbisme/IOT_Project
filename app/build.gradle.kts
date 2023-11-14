@@ -54,4 +54,6 @@ dependencies {
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth:21.1.0")
 
+    implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
+
 }
