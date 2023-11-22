@@ -1,23 +1,16 @@
 package xbisme.iot_project.Fragment;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.graphics.drawable.LayerDrawable;
+
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.Navigation;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
-import androidx.work.Data;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -55,11 +47,10 @@ import xbisme.iot_project.R;
 
 
 public class MainScreen extends Fragment {
-    private TextView hi_text, location_text, temperature_text, humidity_text, gas_tex;
+    private TextView hi_text, location_text, temperature_text, humidity_text, gas_tex, human_inside;
     private ProgressBar temperature, humidity, gas;
     private ImageView flame;
     private static final String SHARE_PREFS = "sharedPrefs";
-    private AppCompatButton logOut_btn;
 
     private SwipeRefreshLayout swipeRefreshLayout;
     @Nullable
@@ -82,21 +73,19 @@ public class MainScreen extends Fragment {
         gas = view.findViewById(R.id.gas_sensor);
         gas_tex = view.findViewById(R.id.gas_text);
         flame = view.findViewById(R.id.flame_sensor);
+        human_inside = view.findViewById(R.id.human_inside);
         swipeRefreshLayout = view.findViewById(R.id.swipe_container);
 
         swipeToRefresh(user);
-        logOut_btn = view.findViewById(R.id.logout_btn);
+        AppCompatButton logOut_btn = view.findViewById(R.id.logout_btn);
 
-        logOut_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARE_PREFS, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putString("name","");
-                editor.apply();
-                FirebaseAuth.getInstance().signOut();
-                Navigation.findNavController(view).navigate(R.id.action_mainScreen_to_loginScreen);
-            }
+        logOut_btn.setOnClickListener(view1 -> {
+            SharedPreferences sharedPreferences = getContext().getSharedPreferences(SHARE_PREFS, Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString("name","");
+            editor.apply();
+            FirebaseAuth.getInstance().signOut();
+            Navigation.findNavController(view1).navigate(R.id.action_mainScreen_to_loginScreen);
         });
 
         if (user != null) {
@@ -113,18 +102,7 @@ public class MainScreen extends Fragment {
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
                 if(writeUserDetail != null){
-                    hi_text.setText("Hi, " + writeUserDetail.getName());
-                    location_text.setText("Location: "+ writeUserDetail.getAddress());
-
-                    temperature.setSecondaryProgress((int) writeUserDetail.getTemp());
-                    temperature_text.setText(writeUserDetail.getTemp() + "°C");
-
-                    humidity.setProgress((int)(writeUserDetail.getHumidity()));
-                    humidity_text.setText(writeUserDetail.getHumidity() + "%");
-
-                    gas.setProgress((int)writeUserDetail.getGas()/10);
-                    gas_tex.setText(writeUserDetail.getGas() + "ppm");
-                    changeFlameUi(writeUserDetail);
+                    changeUi(writeUserDetail);
                     getFCMToken(user);
                 }
             }
@@ -157,16 +135,32 @@ public class MainScreen extends Fragment {
                         }
                     }
                     private void checkWarningFire(DatabaseReference databaseReference, ReadWriteUserDetail readWriteUserDetail) {
-                        if((readWriteUserDetail.getGas() == 400 || readWriteUserDetail.getTemp() == 40)) {
-                            databaseReference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for(DataSnapshot allSnapshot : snapshot.getChildren()) {
-                                        try {
-                                            ReadWriteUserDetail otherUser = allSnapshot.getValue(ReadWriteUserDetail.class);
+
+                        databaseReference.addValueEventListener(new ValueEventListener() {
+                            int level;
+                            @Override
+                            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                                if((readWriteUserDetail.getGas() == 400
+                                        || readWriteUserDetail.getTemp() == 40)) {
+                                    level = 1;
+                                } else if ((readWriteUserDetail.getTemp() > 40 && readWriteUserDetail.getTemp() < 80)
+                                        ||(readWriteUserDetail.getGas() > 400 && readWriteUserDetail.getGas() < 800)) {
+                                    level = 2;
+                                }
+                                else if (readWriteUserDetail.getTemp() >= 80 || readWriteUserDetail.getGas() >= 800) {
+                                    level = 3;
+                                }
+                                getValue2SendNoti(snapshot,level);
+                            }
+                            private void getValue2SendNoti(DataSnapshot snapshot, int level) {
+                                for(DataSnapshot allSnapshot : snapshot.getChildren()) {
+                                    try {
+                                        ReadWriteUserDetail otherUser = allSnapshot.getValue(ReadWriteUserDetail.class);
+                                        if (otherUser != null) {
                                             String message = "Hiện tại nhà " + readWriteUserDetail.getName()
                                                     + " tại địa chỉ: " + readWriteUserDetail.getAddress()
-                                                    + " đang bị cháy mức độ 1, bạn hãy chú di tán";
+                                                    + " đang bị cháy mức độ " + level + ", bạn hãy chú di tán";
                                             JSONObject jsonObject =new JSONObject();
                                             JSONObject notification =  new JSONObject();
                                             notification.put("title", readWriteUserDetail.getName());
@@ -178,87 +172,18 @@ public class MainScreen extends Fragment {
                                             jsonObject.put("to",otherUser.getToken());
                                             callApi(jsonObject);
                                         }
-                                        catch (Exception e) {
-
-                                        }
                                     }
-
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-                        }
-                        else if((readWriteUserDetail.getTemp() > 40 && readWriteUserDetail.getTemp() < 80)||(readWriteUserDetail.getGas() > 400 && readWriteUserDetail.getGas() < 800)) {
-                            databaseReference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for(DataSnapshot allSnapshot : snapshot.getChildren()) {
-                                        try {
-                                            ReadWriteUserDetail otherUser = allSnapshot.getValue(ReadWriteUserDetail.class);
-                                            String message = "Hiện tại nhà " + readWriteUserDetail.getName()
-                                                    + " tại địa chỉ: " + readWriteUserDetail.getAddress()
-                                                    + " đang bị cháy mức độ 2, bạn hãy chú di tán";
-                                            JSONObject jsonObject =new JSONObject();
-                                            JSONObject notification =  new JSONObject();
-                                            notification.put("title", readWriteUserDetail.getName());
-                                            notification.put("body", message);
-                                            JSONObject dataObj =  new JSONObject();
-                                            dataObj.put("userId", readWriteUserDetail.getName());
-                                            jsonObject.put("notification", notification);
-                                            jsonObject.put("data", dataObj);
-                                            jsonObject.put("to",otherUser.getToken());
-                                            callApi(jsonObject);
-                                        }
-                                        catch (Exception e) {
-
-                                        }
+                                    catch (Exception e) {
+                                        Log.e("Error in MainScreen", e.getCause().toString());
                                     }
-
                                 }
+                            }
 
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
+                            @Override
+                            public void onCancelled(@NonNull DatabaseError error) {
 
-                                }
-                            });
-                        }
-                        else if(readWriteUserDetail.getTemp() >= 80 || readWriteUserDetail.getGas() >= 800) {
-                            databaseReference.addValueEventListener(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                    for(DataSnapshot allSnapshot : snapshot.getChildren()) {
-                                        try {
-                                            ReadWriteUserDetail otherUser = allSnapshot.getValue(ReadWriteUserDetail.class);
-                                            String message = "Hiện tại nhà " + readWriteUserDetail.getName()
-                                                    + " tại địa chỉ: " + readWriteUserDetail.getAddress()
-                                                    + " đang bị cháy mức độ 3, bạn hãy chú di tán";
-                                            JSONObject jsonObject =new JSONObject();
-                                            JSONObject notification =  new JSONObject();
-                                            notification.put("title", readWriteUserDetail.getName());
-                                            notification.put("body", message);
-                                            JSONObject dataObj =  new JSONObject();
-                                            dataObj.put("userId", readWriteUserDetail.getName());
-                                            jsonObject.put("notification", notification);
-                                            jsonObject.put("data", dataObj);
-                                            jsonObject.put("to",otherUser.getToken());
-                                            callApi(jsonObject);
-                                        }
-                                        catch (Exception e) {
-
-                                        }
-                                    }
-
-                                }
-
-                                @Override
-                                public void onCancelled(@NonNull DatabaseError error) {
-
-                                }
-                            });
-                        }
+                            }
+                        });
                     }
                 });
 
@@ -281,7 +206,7 @@ public class MainScreen extends Fragment {
                     }
 
                     @Override
-                    public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                    public void onResponse(@NonNull Call call, @NonNull Response response) {
 
                     }
                 });
@@ -289,82 +214,51 @@ public class MainScreen extends Fragment {
         });
     }
 
-    private void changeTempUi(ReadWriteUserDetail writeUserDetail) {
-        if(writeUserDetail != null) {
-            double temp = writeUserDetail.getTemp();
-            int backgroundColor = ContextCompat.getColor(getContext(), R.color.back_progress);
-            int color = R.color.normal;
-            if(temp < 40) {
-                 color = ContextCompat.getColor(getContext(),R.color.normal);
-            }
-            else if (40 <= temp && temp < 80) {
-                 color = ContextCompat.getColor(getContext(),R.color.warning);
-            }
-            else if (80 <= temp && temp <= 100) {
-                 color = ContextCompat.getColor(getContext(),R.color.dangerous);
-            }
+    private void changeUi(ReadWriteUserDetail writeUserDetail) {
+        String hiText = "Hi, " + writeUserDetail.getName();
+        String locationText = "Location: "+ writeUserDetail.getAddress();
+        String tempText = writeUserDetail.getTemp() + "°C";
+        String humidityText = writeUserDetail.getHumidity() + "%";
+        String gasText = writeUserDetail.getGas() + "ppm";
+        String humanInside = "People: " + writeUserDetail.getHuman_inside();
 
-            Drawable[] layers = new Drawable[2];
-            GradientDrawable backgroundDrawable = new GradientDrawable();
-            backgroundDrawable.setShape(GradientDrawable.RING);
-            backgroundDrawable.setThicknessRatio(16);
-            backgroundDrawable.setUseLevel(false);
-            backgroundDrawable.setColor(backgroundColor);
-            layers[0] = backgroundDrawable;
+        hi_text.setText(hiText);
+        location_text.setText(locationText);
+        temperature.setSecondaryProgress((int) writeUserDetail.getTemp());
+        temperature_text.setText(tempText);
+        humidity.setProgress((int)(writeUserDetail.getHumidity()));
+        humidity_text.setText(humidityText);
+        gas.setProgress((int)writeUserDetail.getGas()/10);
+        gas_tex.setText(gasText);
+        human_inside.setText(humanInside);
 
-            // Lớp thứ hai: Màu sắc tiến trình
-            GradientDrawable progressDrawable = new GradientDrawable();
-            progressDrawable.setShape(GradientDrawable.RING);
-            progressDrawable.setThicknessRatio(16);
-            progressDrawable.setUseLevel(true);
-            progressDrawable.setColor(color);
-            layers[1] = progressDrawable;
-
-            LayerDrawable layerDrawable = new LayerDrawable(layers);
-
-            // Đặt progressDrawable của ProgressBar là LayerDrawable mới
-            temperature.setProgressDrawable(layerDrawable);
-
-        }
-    }
-    private void changeFlameUi(ReadWriteUserDetail writeUserDetail) {
-        if (writeUserDetail != null) {
-            if(writeUserDetail.getFlame() == 0) {
-                if (writeUserDetail.getTemp() >= 40 && writeUserDetail.getTemp() < 80) {
-                    flame.setImageResource(R.drawable.warning);
-                }
-                else if (writeUserDetail.getTemp() >= 80) {
-                    flame.setImageResource(R.drawable.fire);
-                }
-                else flame.setImageResource(R.drawable.no_fire);
-            }
-            else flame.setImageResource(R.drawable.no_fire);
-        }
+        if (writeUserDetail.getFlame() == 0) {
+            if (writeUserDetail.getTemp() >= 40 && writeUserDetail.getTemp() < 80) {
+                flame.setImageResource(R.drawable.warning);
+            } else if (writeUserDetail.getTemp() >= 80) {
+                flame.setImageResource(R.drawable.fire);
+            } else flame.setImageResource(R.drawable.no_fire);
+        } else flame.setImageResource(R.drawable.no_fire);
     }
     private void getFCMToken(FirebaseUser user){
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                if (task.isSuccessful()) {
-                    String token = task.getResult();
-                    DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user");
-                    databaseReference.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(@NonNull DataSnapshot snapshot) {
-                            ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
+        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String token = task.getResult();
+                DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("user");
+                databaseReference.child(user.getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        ReadWriteUserDetail writeUserDetail = snapshot.getValue(ReadWriteUserDetail.class);
+                        if(writeUserDetail!=null){
                             writeUserDetail.setToken(token);
                             databaseReference.child(user.getUid()).setValue(writeUserDetail);
-
                         }
-
-                        @Override
-                        public void onCancelled(@NonNull DatabaseError error) {
-
-                        }
-                    });
-                    Toast.makeText(getContext(),token,Toast.LENGTH_SHORT).show();
-                    Log.i("Result", token);
-                }
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                        Log.e("Error in MainScreen in Token", error.toString());
+                    }
+                });
             }
         });
     }

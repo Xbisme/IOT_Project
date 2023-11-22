@@ -4,7 +4,7 @@ public class ReadWriteUserDetail {
     private String name, address, numberPhone, token;
     private double temp, gas, humidity;
 
-    private int flame;
+    private int flame, human_inside;
     public ReadWriteUserDetail() {
     }
     public ReadWriteUserDetail(String name, String address, String numberPhone) {
@@ -12,6 +12,15 @@ public class ReadWriteUserDetail {
         this.name = name;
         this.address = address;
         this.numberPhone = numberPhone;
+        this.human_inside = 0;
+    }
+
+    public int getHuman_inside() {
+        return human_inside;
+    }
+
+    public void setHuman_inside(int human_inside) {
+        this.human_inside = human_inside;
     }
 
     public double getGas() {

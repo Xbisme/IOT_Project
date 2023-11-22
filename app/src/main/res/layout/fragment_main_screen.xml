@@ -38,7 +38,7 @@
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:text="Fire Watch Guardian"
-                android:textSize="25dp"
+                android:textSize="25sp"
                 android:textStyle="bold" />
             <ImageView
                 android:id="@+id/icon_main"
@@ -55,7 +55,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginVertical="25dp"
-
             android:layout_below="@+id/header_main_title">
             <TextView
                 android:id="@+id/hi_text"
@@ -63,7 +62,7 @@
                 android:layout_height="wrap_content"
                 android:text="Hi,"
                 style="@style/text_style"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:layout_marginStart="10dp"
                 />
             <TextView
@@ -73,9 +72,20 @@
                 android:layout_marginTop="10dp"
                 android:text="Your Address: "
                 style="@style/text_style"
-                android:textSize="20dp"
+                android:textSize="20sp"
                 android:layout_below="@id/hi_text"
                 android:layout_marginStart="10dp"
+                />
+            <TextView
+                android:id="@+id/human_inside"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="People: "
+                style="@style/text_style"
+                android:textSize="20sp"
+                android:layout_below="@id/location_text"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="10dp"
                 />
         </RelativeLayout>
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -102,7 +112,7 @@
                     android:layout_centerHorizontal="true"
                     android:text="Flame"
                     android:textColor="@color/black"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <ImageView
                     android:id="@+id/flame_sensor"
@@ -128,7 +138,7 @@
                     android:layout_centerHorizontal="true"
                     android:text="Humidity"
                     android:textColor="@color/black"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <ProgressBar
                     android:id="@+id/humidity_sensor"
@@ -146,7 +156,7 @@
                     style="@style/text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="60%"
+                    android:text=""
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
                     android:textColor="@color/black"
@@ -170,7 +180,7 @@
                     android:layout_centerHorizontal="true"
                     android:text="Temperature"
                     android:textColor="@color/black"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <ProgressBar
                     android:id="@+id/temper_sensor"
@@ -186,7 +196,7 @@
                     style="@style/text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="60%"
+                    android:text=""
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
                     android:textColor="@color/black"
@@ -210,7 +220,7 @@
                     android:layout_centerHorizontal="true"
                     android:text="Gas"
                     android:textColor="@color/black"
-                    android:textSize="15dp" />
+                    android:textSize="15sp" />
 
                 <ProgressBar
                     android:id="@+id/gas_sensor"
@@ -219,7 +229,7 @@
                     android:indeterminateOnly="false"
                     android:layout_centerVertical="true"
                     android:indeterminate="false"
-                    android:progress="60"
+                    android:progress="0"
                     android:progressDrawable="@drawable/circle"
                     android:rotation="-270" />
 
@@ -228,7 +238,7 @@
                     style="@style/text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="0%"
+                    android:text=""
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
                     android:textColor="@color/black"

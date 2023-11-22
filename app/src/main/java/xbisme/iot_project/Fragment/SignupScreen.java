@@ -44,7 +44,6 @@ public class SignupScreen extends Fragment {
     private EditText displayName;
     private EditText userAddress;
     private EditText userPhone;
-
     private ImageView hide_show_icon,hide_show_cf_icon;
     private FirebaseAuth mAuth;
 
