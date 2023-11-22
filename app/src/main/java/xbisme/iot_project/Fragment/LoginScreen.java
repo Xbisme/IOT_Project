@@ -3,7 +3,6 @@ package xbisme.iot_project.Fragment;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.text.TextUtils;
 import android.text.method.HideReturnsTransformationMethod;
 import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
@@ -55,7 +54,7 @@ public class LoginScreen extends Fragment {
         hide_show_icon = view.findViewById(R.id.hide_show_pass_log);
         checkBox = view.findViewById(R.id.checkbox_remember);
 
-        SharedPreferences share = getContext().getSharedPreferences(SHARE_PREFS, Context.MODE_PRIVATE);
+        SharedPreferences share = requireContext().getSharedPreferences(SHARE_PREFS, Context.MODE_PRIVATE);
         String check = share.getString("name","");
         if (check.equals("true")) {
             Navigation.findNavController(view)

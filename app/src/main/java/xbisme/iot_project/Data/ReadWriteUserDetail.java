@@ -1,13 +1,14 @@
 package xbisme.iot_project.Data;
 
 public class ReadWriteUserDetail {
-    private String name, address, numberPhone;
+    private String name, address, numberPhone, token;
     private double temp, gas, humidity;
 
     private int flame;
     public ReadWriteUserDetail() {
     }
     public ReadWriteUserDetail(String name, String address, String numberPhone) {
+        this.token = "Null";
         this.name = name;
         this.address = address;
         this.numberPhone = numberPhone;
@@ -67,5 +68,13 @@ public class ReadWriteUserDetail {
 
     public void setTemp(double temp) {
         this.temp = temp;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

@@ -109,7 +109,6 @@
                     android:layout_width="150dp"
                     android:layout_height="150dp"
                     android:src="@drawable/no_fire"
-                    android:progress="60"
                     android:rotation="0" />
             </RelativeLayout>
             <RelativeLayout
@@ -138,7 +137,7 @@
                     android:layout_centerVertical="true"
                     android:indeterminate="false"
                     android:indeterminateOnly="false"
-                    android:progress="60"
+                    android:progress="0"
                     android:progressDrawable="@drawable/circle"
                     android:rotation="-270" />
 
@@ -229,7 +228,7 @@
                     style="@style/text_style"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="60%"
+                    android:text="0%"
                     android:layout_centerVertical="true"
                     android:layout_centerHorizontal="true"
                     android:textColor="@color/black"
@@ -244,7 +243,8 @@
             android:layout_below="@id/constraint"
             android:layout_marginTop="30dp"
             android:padding="15dp"
-            android:text="Logout"
+            android:text="Log out"
+            android:textColor="@color/black"
             android:layout_marginHorizontal="20dp"
             />
     </RelativeLayout >

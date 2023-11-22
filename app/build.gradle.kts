@@ -1,6 +1,7 @@
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+
 }
 
 android {
@@ -44,6 +45,9 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:22.1.2")
     implementation("androidx.navigation:navigation-fragment:2.5.2")
     implementation("androidx.navigation:navigation-ui:2.5.2")
+    implementation("com.google.firebase:firebase-messaging:23.3.1")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
+    implementation("androidx.work:work-runtime:2.8.1")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -53,7 +57,6 @@ dependencies {
     // Add the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation("com.google.firebase:firebase-auth:21.1.0")
-
     implementation ("androidx.swiperefreshlayout:swiperefreshlayout:1.1.0")
-
+    implementation("com.squareup.okhttp3:okhttp:4.11.0")
 }
